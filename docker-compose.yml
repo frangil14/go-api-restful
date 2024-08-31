@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+  db:
+    hostname: postgres
+    container_name: postgres
+    image: postgres:13.13-alpine3.17
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - ./data/postgres/persistent_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U username -d mydatabase"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    # For connecting outside Docker network
+    ports:
+      - "5432:5432"
+
+  # web:
+  #   hostname: flask-app
+  #   container_name: flask-app
+  #   image: frangil14/web-service-flask:1.0.0
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     - DATABASE_URI=postgresql://username:password@postgres:5432/mydatabase
+  #     - TRACK_MODIFICATIONS=False
+  #   networks:
+  #     - backend
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl --fail http://localhost:5000/ || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 60s
+    # ports:
+    #   - "5000:5000"
+
+  # nginx:
+  #   hostname: nginx
+  #   container_name: nginx
+  #   image: nginx:stable-alpine-perl
+  #   depends_on:
+  #     web:
+  #       condition: service_healthy
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   networks:
+  #     - backend
+
+networks:
+  backend:
+    driver: bridge
+    name: backend
+
+volumes:
+  persistent_data:
