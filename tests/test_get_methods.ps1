@@ -1,25 +1,30 @@
-# Definir la URL base de la API
 $baseUrl = "http://localhost:8080"
 
-# Función para realizar una solicitud GET y mostrar la respuesta
 function Get-ApiResponse {
     param (
         [string]$endpoint
     )
 
     $url = "$baseUrl$endpoint"
-    Write-Host "Haciendo solicitud GET a $url"
+    Write-Host "Executing GET to $url"
 
     try {
-        $response = Invoke-RestMethod -Uri $url -Method Get
-        Write-Host "Respuesta:"
-        Write-Output $response
+        $response = Invoke-WebRequest -Uri $url -Method Get
+        Write-Host "Status code: $($response.StatusCode)"
+        Write-Host "Response:"
+        $content = $response.Content 
+        Write-Output ($content | Out-String)
     } catch {
-        Write-Host "Error:"
+        Write-Host "Error in the request:"
         Write-Output $_.Exception.Message
     }
 }
 
-# Ejecutar solicitudes GET a los endpoints deseados
+# Execute endpoints
 Get-ApiResponse "/"
+Start-Sleep -Seconds 1
 Get-ApiResponse "/users"
+Start-Sleep -Seconds 1
+Get-ApiResponse "/users/1"
+Start-Sleep -Seconds 1
+Get-ApiResponse "/users/2"
