@@ -41,9 +41,10 @@ func main() {
     r := mux.NewRouter()
     r.HandleFunc("/", handlers.HelloAPI).Methods("GET")
     r.HandleFunc("/users", handlers.GetUsers).Methods("GET")
-    r.HandleFunc("/users", handlers.CreateUser).Methods("POST")
     r.HandleFunc("/users/{id}", handlers.GetUserById).Methods("GET")
-    
+    r.HandleFunc("/users", handlers.CreateUser).Methods("POST")
+    r.HandleFunc("/users/{id}", handlers.UpdateUser).Methods("PUT")
+    r.HandleFunc("/users/{id}", handlers.UpdateUserPartially).Methods("PATCH")
 
     
     fmt.Printf("Server listening on http://localhost:%s\n", port)
